@@ -626,6 +626,86 @@ function ModernUI:CreateWindow(options)
 				return CardContainer
 			end
 
+			function Container:CreatePlayerStatus(options)
+				options = options or {}
+				local Player = options.Player or game.Players.LocalPlayer
+				local ExecutorName = options.ExecutorName or "Unknown"
+				
+				local StatusFrame = Create("Frame", {
+					Name = "PlayerStatus",
+					Parent = ParentContainer,
+					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+					Size = UDim2.new(1, 0, 0, 70),
+					BorderSizePixel = 0
+				})
+				Create("UICorner", { Parent = StatusFrame, CornerRadius = UDim.new(0, 12) })
+				Create("UIStroke", { Parent = StatusFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+				
+				-- Avatar
+				local Avatar = Create("ImageLabel", {
+					Parent = StatusFrame,
+					BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+					Position = UDim2.new(0, 10, 0, 10),
+					Size = UDim2.new(0, 50, 0, 50),
+					Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=150&h=150",
+					BorderSizePixel = 0
+				})
+				Create("UICorner", { Parent = Avatar, CornerRadius = UDim.new(1, 0) })
+				
+				local AvatarStroke = Create("UIStroke", {
+					Parent = Avatar,
+					Color = ModernUI.Theme.Accent,
+					Thickness = 2
+				})
+				
+				-- Player Info Container
+				local InfoContainer = Create("Frame", {
+					Parent = StatusFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 70, 0, 8),
+					Size = UDim2.new(1, -80, 1, -16)
+				})
+				
+				-- Display Name
+				local DisplayName = Create("TextLabel", {
+					Parent = InfoContainer,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 0, 0, 0),
+					Size = UDim2.new(1, 0, 0, 18),
+					Font = Enum.Font.GothamBold,
+					Text = Player.DisplayName,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 15,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+				
+				-- Username
+				local Username = Create("TextLabel", {
+					Parent = InfoContainer,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 0, 0, 18),
+					Size = UDim2.new(1, 0, 0, 16),
+					Font = Enum.Font.Gotham,
+					Text = "@" .. Player.Name,
+					TextColor3 = ModernUI.Theme.TextDark,
+					TextSize = 13,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+				
+				-- Executor Info
+				local ExecutorLabel = Create("TextLabel", {
+					Parent = InfoContainer,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 0, 0, 34),
+					Size = UDim2.new(1, 0, 0, 16),
+					Font = Enum.Font.Gotham,
+					Text = "🎮 Executor: " .. ExecutorName,
+					TextColor3 = ModernUI.Theme.Accent,
+					TextSize = 12,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+			end
+
 			function Container:CreateSection(text)
 				local SectionFrame = Create("Frame", {
 					Name = "Section",
