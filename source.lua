@@ -17,9 +17,9 @@ local ModernUI = {
 		TextDark = Color3.fromRGB(150, 150, 150),
 		Accent = Color3.fromRGB(46, 204, 113), -- Emerald Green
 		GradientStart = Color3.fromRGB(46, 204, 113),
-		GradientEnd = Color3.fromRGB(5, 5, 5), -- Much darker for dramatic gradient
+		GradientEnd = Color3.fromRGB(5, 5, 5),
 		Divider = Color3.fromRGB(40, 40, 40),
-		CornerRadius = UDim.new(0, 16), -- Larger corner radius
+		CornerRadius = UDim.new(0, 16),
 		Stroke = Color3.fromRGB(40, 40, 40)
 	},
 	Folder = "ModernUI",
@@ -99,8 +99,6 @@ function ModernUI:LoadConfig(name)
 		local data = HttpService:JSONDecode(json)
 		for flag, value in pairs(data) do
 			self.Flags[flag] = value
-			-- Note: This simple load doesn't automatically update UI elements unless they listen to Flags or we implement a callback system for flags.
-			-- For a proper system, we'd need to fire callbacks.
 			if self.ConfigCallbacks and self.ConfigCallbacks[flag] then
 				self.ConfigCallbacks[flag](value)
 			end
@@ -124,8 +122,8 @@ function ModernUI:CreateWindow(options)
 	local MainFrame = Create("Frame", {
 		Name = "MainFrame",
 		Parent = ScreenGui,
-		BackgroundColor3 = Color3.fromRGB(255, 255, 255), -- White base for gradient
-		BackgroundTransparency = 0.1, -- Slight transparency for glass effect
+		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+		BackgroundTransparency = 0.1,
 		Position = UDim2.new(0.5, -350, 0.5, -250),
 		Size = UDim2.new(0, 700, 0, 500),
 		BorderSizePixel = 0
@@ -133,18 +131,18 @@ function ModernUI:CreateWindow(options)
 	Create("UICorner", { Parent = MainFrame, CornerRadius = ModernUI.Theme.CornerRadius })
 	Create("UIStroke", { Parent = MainFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 	
-	-- Dramatic gradient similar to reference (dark color to pure black)
+	-- Dramatic gradient
 	local MainGradient = Create("UIGradient", {
 		Parent = MainFrame,
 		Color = ColorSequence.new{
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 35, 30)), -- Dark teal/green top
-			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(5, 10, 8)), -- Mid darker
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)) -- Pure black bottom
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 35, 30)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(5, 10, 8)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 		},
-		Rotation = 180 -- Top to bottom
+		Rotation = 180
 	})
 
-	-- Sidebar (Left)
+	-- Sidebar
 	local Sidebar = Create("Frame", {
 		Name = "Sidebar",
 		Parent = MainFrame,
@@ -154,10 +152,6 @@ function ModernUI:CreateWindow(options)
 		BorderSizePixel = 0
 	})
 	Create("UICorner", { Parent = Sidebar, CornerRadius = ModernUI.Theme.CornerRadius })
-	
-	-- Fix Sidebar Corner (Right side shouldn't be rounded if we want a clean split, but let's keep it rounded for "floating" look or cover it)
-	-- Actually, let's make the sidebar floating inside the main frame or just split.
-	-- Let's go with a split view.
 	
 	local SidebarCover = Create("Frame", {
 		Parent = Sidebar,
@@ -203,7 +197,7 @@ function ModernUI:CreateWindow(options)
 		PaddingRight = UDim.new(0, 15)
 	})
 
-	-- Content Area (Right)
+	-- Content Area
 	local PageContainer = Create("Frame", {
 		Name = "PageContainer",
 		Parent = MainFrame,
@@ -231,7 +225,7 @@ function ModernUI:CreateWindow(options)
 	CloseBtn.MouseLeave:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = ModernUI.Theme.TextDark}):Play() end)
 
 	MakeDraggable(Sidebar, MainFrame)
-	MakeDraggable(MainFrame, MainFrame) -- Allow dragging from empty space too
+	MakeDraggable(MainFrame, MainFrame)
 
 	local NotificationContainer = Create("Frame", {
 		Name = "Notifications",
@@ -421,8 +415,8 @@ function ModernUI:CreateWindow(options)
 			})
 		end
 		
-		-- Active Indicator (Glow/Background)
 		local ActiveIndicator = Create("Frame", {
+			Name = "ActiveIndicator",
 			Parent = TabButton,
 			BackgroundColor3 = ModernUI.Theme.Accent,
 			BackgroundTransparency = 0.9,
@@ -432,8 +426,8 @@ function ModernUI:CreateWindow(options)
 		})
 		Create("UICorner", { Parent = ActiveIndicator, CornerRadius = UDim.new(0, 8) })
 		
-		-- Side Bar Indicator
 		local BarIndicator = Create("Frame", {
+			Name = "BarIndicator",
 			Parent = TabButton,
 			BackgroundColor3 = ModernUI.Theme.Accent,
 			Position = UDim2.new(0, -12, 0.5, -10),
@@ -475,19 +469,6 @@ function ModernUI:CreateWindow(options)
 					local icon = child:FindFirstChild("ImageLabel")
 					if icon then TweenService:Create(icon, TweenInfo.new(0.2), {ImageColor3 = ModernUI.Theme.TextDark}):Play() end
 					
-					local activeInd = child:FindFirstChild("Frame") -- The background glow
-					if activeInd then activeInd.Visible = false end
-					
-					-- We need to find the bar indicator specifically, but since we added multiple frames, let's just hide all frames except ImageLabel? 
-					-- Or better, reference them.
-					-- Since we can't easily ref them in this loop without storing them, let's just rely on child order or names if we named them.
-					-- Let's name them.
-				end
-			end
-			
-			-- Reset all indicators (Simplified loop above wasn't perfect, let's do it properly)
-			for _, child in pairs(TabContainer:GetChildren()) do
-				if child:IsA("TextButton") then
 					local ind1 = child:FindFirstChild("ActiveIndicator")
 					local ind2 = child:FindFirstChild("BarIndicator")
 					if ind1 then ind1.Visible = false end
@@ -509,10 +490,6 @@ function ModernUI:CreateWindow(options)
 			BarIndicator.Visible = true
 			Page.Visible = true
 		end
-		
-		-- Naming for easier access
-		ActiveIndicator.Name = "ActiveIndicator"
-		BarIndicator.Name = "BarIndicator"
 
 		TabButton.MouseButton1Click:Connect(Activate)
 
@@ -528,7 +505,7 @@ function ModernUI:CreateWindow(options)
 				local SectionFrame = Create("Frame", {
 					Name = "Section",
 					Parent = ParentContainer,
-					BackgroundColor3 = Color3.fromRGB(20, 20, 20), -- Solid dark background
+					BackgroundColor3 = Color3.fromRGB(20, 20, 20),
 					Size = UDim2.new(1, 0, 0, 0),
 					BorderSizePixel = 0,
 					ClipsDescendants = true
@@ -592,10 +569,9 @@ function ModernUI:CreateWindow(options)
 					TextSize = 14,
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = ButtonFrame, CornerRadius = UDim.new(0, 21) }) -- Pill shape
+				Create("UICorner", { Parent = ButtonFrame, CornerRadius = UDim.new(0, 21) })
 				Create("UIStroke", { Parent = ButtonFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
-				-- Subtle Gradient for Button
 				local Gradient = Create("UIGradient", {
 					Parent = ButtonFrame,
 					Color = ColorSequence.new{
@@ -689,7 +665,6 @@ function ModernUI:CreateWindow(options)
 					end
 				end
 				
-				-- Initial State
 				if State then
 					Indicator.BackgroundColor3 = ModernUI.Theme.Accent
 					Circle.Position = UDim2.new(1, -18, 0.5, -8)
@@ -714,6 +689,54 @@ function ModernUI:CreateWindow(options)
 				local Callback = options.Callback or function() end
 
 				if Flag then
+					Default = ModernUI.Flags[Flag] or Default
+				end
+
+				local Value = Default
+
+				local SliderFrame = Create("Frame", {
+					Name = "Slider",
+					Parent = ParentContainer,
+					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+					Size = UDim2.new(1, 0, 0, 45),
+					BorderSizePixel = 0
+				})
+				Create("UICorner", { Parent = SliderFrame, CornerRadius = UDim.new(0, 8) })
+				Create("UIStroke", { Parent = SliderFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+
+				local Fill = Create("Frame", {
+					Parent = SliderFrame,
+					BackgroundColor3 = ModernUI.Theme.Accent,
+					Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0),
+					BorderSizePixel = 0
+				})
+				Create("UICorner", { Parent = Fill, CornerRadius = UDim.new(0, 8) })
+				
+				local Label = Create("TextLabel", {
+					Parent = SliderFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 15, 0, 0),
+					Size = UDim2.new(1, -30, 1, 0),
+					Font = Enum.Font.GothamBold,
+					Text = tostring(Value) .. " " .. Text,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 14,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					ZIndex = 2
+				})
+
+				local Trigger = Create("TextButton", {
+					Parent = SliderFrame,
+					BackgroundTransparency = 1,
+					Size = UDim2.new(1, 0, 1, 0),
+					Text = "",
+					ZIndex = 3
+				})
+
+				local function SetValue(val)
+					Value = math.clamp(val, Min, Max)
+					if Flag then ModernUI.Flags[Flag] = Value end
+					Label.Text = tostring(Value) .. " " .. Text
 					local Fraction = (Value - Min) / (Max - Min)
 					TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(Fraction, 0, 1, 0)}):Play()
 					Callback(Value)
@@ -952,70 +975,6 @@ function ModernUI:CreateWindow(options)
 					TextXAlignment = Enum.TextXAlignment.Left
 				})
 			end
-			
-			function Container:CreateParagraph(options)
-				options = options or {}
-				local Title = options.Title or "Paragraph"
-				local Content = options.Content or "Content..."
-				
-				local ParagraphFrame = Create("Frame", {
-					Name = "Paragraph",
-					Parent = ParentContainer,
-					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 0),
-					BorderSizePixel = 0
-				})
-				Create("UICorner", { Parent = ParagraphFrame, CornerRadius = UDim.new(0, 4) })
-				
-				local PTitle = Create("TextLabel", {
-					Parent = ParagraphFrame,
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 5),
-					Size = UDim2.new(1, -20, 0, 20),
-					Font = Enum.Font.GothamBold,
-					Text = Title,
-					TextColor3 = ModernUI.Theme.Text,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
-				
-				local PContent = Create("TextLabel", {
-					Parent = ParagraphFrame,
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 25),
-					Size = UDim2.new(1, -20, 0, 0),
-					Font = Enum.Font.Gotham,
-					Text = Content,
-					TextColor3 = ModernUI.Theme.TextDark,
-					TextSize = 13,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					TextYAlignment = Enum.TextYAlignment.Top,
-					TextWrapped = true
-				})
-				
-				local TextSize = TextService:GetTextSize(Content, 13, Enum.Font.Gotham, Vector2.new(400, math.huge))
-				PContent.Size = UDim2.new(1, -20, 0, TextSize.Y + 10)
-				ParagraphFrame.Size = UDim2.new(1, 0, 0, TextSize.Y + 40)
-			end
-
-			function Container:CreateDivider()
-				local Divider = Create("Frame", {
-					Name = "Divider",
-					Parent = ParentContainer,
-					BackgroundColor3 = ModernUI.Theme.Divider,
-					Size = UDim2.new(1, 0, 0, 1),
-					BorderSizePixel = 0
-				})
-			end
-
-			function Container:CreateSpacer(size)
-				local Spacer = Create("Frame", {
-					Name = "Spacer",
-					Parent = ParentContainer,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, size or 10)
-				})
-			end
 
 			function Container:CreateKeybind(options)
 				options = options or {}
@@ -1023,10 +982,6 @@ function ModernUI:CreateWindow(options)
 				local Default = options.Default or Enum.KeyCode.RightControl
 				local Flag = options.Flag
 				local Callback = options.Callback or function() end
-
-				if Flag then
-					-- ModernUI.Flags[Flag] = ...
-				end
 
 				local Key = Default
 
@@ -1130,7 +1085,6 @@ function ModernUI:CreateWindow(options)
 				Create("UICorner", { Parent = ColorPreview, CornerRadius = UDim.new(0, 4) })
 				Create("UIStroke", { Parent = ColorPreview, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
-				-- Simple Color Picker Popup (RGB Sliders)
 				local PickerPopup = Create("Frame", {
 					Parent = ScreenGui,
 					BackgroundColor3 = ModernUI.Theme.Background,
@@ -1153,7 +1107,6 @@ function ModernUI:CreateWindow(options)
 					PickerPopup.Position = UDim2.new(0, ColorPreview.AbsolutePosition.X - 160, 0, ColorPreview.AbsolutePosition.Y + 30)
 				end)
 				
-				-- Helper for picker sliders
 				local function CreatePickerSlider(y, color, onChange)
 					local SFrame = Create("Frame", {
 						Parent = PickerPopup,
