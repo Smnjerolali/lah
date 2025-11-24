@@ -20,8 +20,22 @@ local ModernUI = {
 		CornerRadius = UDim.new(0, 12),
 		Stroke = Color3.fromRGB(40, 40, 40)
 	},
-	Folder = "ModernUI"
+	Folder = "ModernUI",
+	Icons = {
+		Home = "rbxassetid://6031075931",
+		Settings = "rbxassetid://6031280882",
+		User = "rbxassetid://6031280984", -- Updated to a user icon
+		Combat = "rbxassetid://6031090990",
+		Visuals = "rbxassetid://6031075929",
+		Search = "rbxassetid://6031154871",
+		Server = "rbxassetid://6031091004", -- Dropdown arrow, can be used as generic
+		Info = "rbxassetid://6031090999"
+	}
 }
+
+function ModernUI:GetIcon(name)
+	return self.Icons[name] or self.Icons.Home -- Default to Home if not found
+end
 
 -- Utility Functions
 local function MakeDraggable(topbarobject, object)
