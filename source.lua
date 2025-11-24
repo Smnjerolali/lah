@@ -16,25 +16,27 @@ local ModernUI = {
 		Text = Color3.fromRGB(240, 240, 240),
 		TextDark = Color3.fromRGB(150, 150, 150),
 		Accent = Color3.fromRGB(46, 204, 113), -- Emerald Green
+		GradientStart = Color3.fromRGB(46, 204, 113),
+		GradientEnd = Color3.fromRGB(5, 5, 5), -- Much darker for dramatic gradient
 		Divider = Color3.fromRGB(40, 40, 40),
-		CornerRadius = UDim.new(0, 12),
+		CornerRadius = UDim.new(0, 16), -- Larger corner radius
 		Stroke = Color3.fromRGB(40, 40, 40)
 	},
 	Folder = "ModernUI",
 	Icons = {
 		Home = "rbxassetid://6031075931",
 		Settings = "rbxassetid://6031280882",
-		User = "rbxassetid://6031280984", -- Updated to a user icon
+		User = "rbxassetid://6031280984",
 		Combat = "rbxassetid://6031090990",
 		Visuals = "rbxassetid://6031075929",
 		Search = "rbxassetid://6031154871",
-		Server = "rbxassetid://6031091004", -- Dropdown arrow, can be used as generic
+		Server = "rbxassetid://6031091004",
 		Info = "rbxassetid://6031090999"
 	}
 }
 
 function ModernUI:GetIcon(name)
-	return self.Icons[name] or self.Icons.Home -- Default to Home if not found
+	return self.Icons[name] or self.Icons.Home
 end
 
 -- Utility Functions
