@@ -8,16 +8,17 @@ local HttpService = game:GetService("HttpService")
 local ModernUI = {
 	Flags = {},
 	Theme = {
-		Background = Color3.fromRGB(30, 30, 30),
-		Header = Color3.fromRGB(25, 25, 25),
-		Sidebar = Color3.fromRGB(35, 35, 35),
-		Element = Color3.fromRGB(45, 45, 45),
-		Section = Color3.fromRGB(40, 40, 40),
+		Background = Color3.fromRGB(15, 15, 15),
+		Header = Color3.fromRGB(15, 15, 15),
+		Sidebar = Color3.fromRGB(20, 20, 20),
+		Element = Color3.fromRGB(25, 25, 25),
+		Section = Color3.fromRGB(20, 20, 20),
 		Text = Color3.fromRGB(240, 240, 240),
-		TextDark = Color3.fromRGB(180, 180, 180),
-		Accent = Color3.fromRGB(0, 122, 204),
-		Divider = Color3.fromRGB(60, 60, 60),
-		CornerRadius = UDim.new(0, 6)
+		TextDark = Color3.fromRGB(150, 150, 150),
+		Accent = Color3.fromRGB(46, 204, 113), -- Emerald Green
+		Divider = Color3.fromRGB(40, 40, 40),
+		CornerRadius = UDim.new(0, 12),
+		Stroke = Color3.fromRGB(40, 40, 40)
 	},
 	Folder = "ModernUI"
 }
@@ -108,51 +109,108 @@ function ModernUI:CreateWindow(options)
 		Name = "MainFrame",
 		Parent = ScreenGui,
 		BackgroundColor3 = ModernUI.Theme.Background,
-		Position = UDim2.new(0.5, -300, 0.5, -200),
-		Size = UDim2.new(0, 600, 0, 400),
+		Position = UDim2.new(0.5, -350, 0.5, -250),
+		Size = UDim2.new(0, 700, 0, 500),
 		BorderSizePixel = 0
 	})
 	Create("UICorner", { Parent = MainFrame, CornerRadius = ModernUI.Theme.CornerRadius })
+	Create("UIStroke", { Parent = MainFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
-	local Header = Create("Frame", {
-		Name = "Header",
+	-- Sidebar (Left)
+	local Sidebar = Create("Frame", {
+		Name = "Sidebar",
 		Parent = MainFrame,
-		BackgroundColor3 = ModernUI.Theme.Header,
-		Size = UDim2.new(1, 0, 0, 40),
+		BackgroundColor3 = ModernUI.Theme.Sidebar,
+		Position = UDim2.new(0, 0, 0, 0),
+		Size = UDim2.new(0, 200, 1, 0),
 		BorderSizePixel = 0
 	})
-	Create("UICorner", { Parent = Header, CornerRadius = ModernUI.Theme.CornerRadius })
+	Create("UICorner", { Parent = Sidebar, CornerRadius = ModernUI.Theme.CornerRadius })
 	
-	local HeaderCover = Create("Frame", {
-		Name = "HeaderCover",
-		Parent = Header,
-		BackgroundColor3 = ModernUI.Theme.Header,
+	-- Fix Sidebar Corner (Right side shouldn't be rounded if we want a clean split, but let's keep it rounded for "floating" look or cover it)
+	-- Actually, let's make the sidebar floating inside the main frame or just split.
+	-- Let's go with a split view.
+	
+	local SidebarCover = Create("Frame", {
+		Parent = Sidebar,
+		BackgroundColor3 = ModernUI.Theme.Sidebar,
 		BorderSizePixel = 0,
-		Position = UDim2.new(0, 0, 1, -10),
-		Size = UDim2.new(1, 0, 0, 10)
+		Position = UDim2.new(1, -10, 0, 0),
+		Size = UDim2.new(0, 10, 1, 0),
+		ZIndex = 0
 	})
 
 	local TitleLabel = Create("TextLabel", {
 		Name = "Title",
-		Parent = Header,
+		Parent = Sidebar,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 15, 0, 0),
-		Size = UDim2.new(1, -30, 1, 0),
+		Position = UDim2.new(0, 20, 0, 25),
+		Size = UDim2.new(1, -40, 0, 30),
 		Font = Enum.Font.GothamBold,
 		Text = Title,
 		TextColor3 = ModernUI.Theme.Text,
-		TextSize = 18,
+		TextSize = 24,
 		TextXAlignment = Enum.TextXAlignment.Left
 	})
+	
+	local TabContainer = Create("ScrollingFrame", {
+		Name = "TabContainer",
+		Parent = Sidebar,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 0, 0, 80),
+		Size = UDim2.new(1, 0, 1, -80),
+		BorderSizePixel = 0,
+		ScrollBarThickness = 0
+	})
+	
+	local TabListLayout = Create("UIListLayout", {
+		Parent = TabContainer,
+		SortOrder = Enum.SortOrder.LayoutOrder,
+		Padding = UDim.new(0, 8)
+	})
+	Create("UIPadding", {
+		Parent = TabContainer,
+		PaddingTop = UDim.new(0, 10),
+		PaddingLeft = UDim.new(0, 15),
+		PaddingRight = UDim.new(0, 15)
+	})
 
-	MakeDraggable(Header, MainFrame)
+	-- Content Area (Right)
+	local PageContainer = Create("Frame", {
+		Name = "PageContainer",
+		Parent = MainFrame,
+		BackgroundColor3 = Color3.new(0,0,0),
+		BackgroundTransparency = 1,
+		Position = UDim2.new(0, 210, 0, 20),
+		Size = UDim2.new(1, -230, 1, -40),
+		ClipsDescendants = true
+	})
+
+	local CloseBtn = Create("TextButton", {
+		Parent = MainFrame,
+		BackgroundTransparency = 1,
+		Position = UDim2.new(1, -40, 0, 15),
+		Size = UDim2.new(0, 25, 0, 25),
+		Text = "X",
+		Font = Enum.Font.GothamBold,
+		TextColor3 = ModernUI.Theme.TextDark,
+		TextSize = 18
+	})
+	CloseBtn.MouseButton1Click:Connect(function()
+		ScreenGui:Destroy()
+	end)
+	CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 50, 50)}):Play() end)
+	CloseBtn.MouseLeave:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = ModernUI.Theme.TextDark}):Play() end)
+
+	MakeDraggable(Sidebar, MainFrame)
+	MakeDraggable(MainFrame, MainFrame) -- Allow dragging from empty space too
 
 	local NotificationContainer = Create("Frame", {
 		Name = "Notifications",
 		Parent = ScreenGui,
 		BackgroundTransparency = 1,
-		Position = UDim2.new(1, -320, 1, -20),
-		Size = UDim2.new(0, 300, 1, 0),
+		Position = UDim2.new(1, -350, 1, -50),
+		Size = UDim2.new(0, 320, 1, 0),
 		AnchorPoint = Vector2.new(0, 1)
 	})
 	
@@ -161,38 +219,6 @@ function ModernUI:CreateWindow(options)
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		VerticalAlignment = Enum.VerticalAlignment.Bottom,
 		Padding = UDim.new(0, 10)
-	})
-
-	local TabContainer = Create("Frame", {
-		Name = "TabContainer",
-		Parent = MainFrame,
-		BackgroundColor3 = ModernUI.Theme.Sidebar,
-		Position = UDim2.new(0, 0, 0, 40),
-		Size = UDim2.new(0, 150, 1, -40),
-		BorderSizePixel = 0
-	})
-	Create("UICorner", { Parent = TabContainer, CornerRadius = UDim.new(0, 0) })
-	
-	local TabListLayout = Create("UIListLayout", {
-		Parent = TabContainer,
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		Padding = UDim.new(0, 5)
-	})
-	Create("UIPadding", {
-		Parent = TabContainer,
-		PaddingTop = UDim.new(0, 10),
-		PaddingLeft = UDim.new(0, 10),
-		PaddingRight = UDim.new(0, 10)
-	})
-
-	local PageContainer = Create("Frame", {
-		Name = "PageContainer",
-		Parent = MainFrame,
-		BackgroundColor3 = Color3.new(0,0,0),
-		BackgroundTransparency = 1,
-		Position = UDim2.new(0, 160, 0, 50),
-		Size = UDim2.new(1, -170, 1, -60),
-		ClipsDescendants = true
 	})
 
 	local Window = {}
@@ -343,18 +369,18 @@ function ModernUI:CreateWindow(options)
 		local TabButton = Create("TextButton", {
 			Name = name .. "Tab",
 			Parent = TabContainer,
-			BackgroundColor3 = ModernUI.Theme.Background,
-			Size = UDim2.new(1, 0, 0, 35),
+			BackgroundColor3 = ModernUI.Theme.Sidebar,
+			Size = UDim2.new(1, 0, 0, 40),
 			AutoButtonColor = false,
-			Font = Enum.Font.Gotham,
+			Font = Enum.Font.GothamMedium,
 			Text = iconId and "      " .. name or name,
 			TextColor3 = ModernUI.Theme.TextDark,
 			TextSize = 14,
-			TextXAlignment = iconId and Enum.TextXAlignment.Left or Enum.TextXAlignment.Center,
+			TextXAlignment = iconId and Enum.TextXAlignment.Left or Enum.TextXAlignment.Left,
 			BorderSizePixel = 0
 		})
-		Create("UICorner", { Parent = TabButton, CornerRadius = UDim.new(0, 4) })
-		Create("UIPadding", { Parent = TabButton, PaddingLeft = UDim.new(0, 10) })
+		Create("UICorner", { Parent = TabButton, CornerRadius = UDim.new(0, 8) })
+		Create("UIPadding", { Parent = TabButton, PaddingLeft = UDim.new(0, 12) })
 
 		if iconId then
 			local Icon = Create("ImageLabel", {
@@ -366,6 +392,28 @@ function ModernUI:CreateWindow(options)
 				ImageColor3 = ModernUI.Theme.TextDark
 			})
 		end
+		
+		-- Active Indicator (Glow/Background)
+		local ActiveIndicator = Create("Frame", {
+			Parent = TabButton,
+			BackgroundColor3 = ModernUI.Theme.Accent,
+			BackgroundTransparency = 0.9,
+			Size = UDim2.new(1, 0, 1, 0),
+			Visible = false,
+			ZIndex = 0
+		})
+		Create("UICorner", { Parent = ActiveIndicator, CornerRadius = UDim.new(0, 8) })
+		
+		-- Side Bar Indicator
+		local BarIndicator = Create("Frame", {
+			Parent = TabButton,
+			BackgroundColor3 = ModernUI.Theme.Accent,
+			Position = UDim2.new(0, -12, 0.5, -10),
+			Size = UDim2.new(0, 4, 0, 20),
+			BorderSizePixel = 0,
+			Visible = false
+		})
+		Create("UICorner", { Parent = BarIndicator, CornerRadius = UDim.new(0, 2) })
 
 		local Page = Create("ScrollingFrame", {
 			Name = name .. "Page",
@@ -375,13 +423,14 @@ function ModernUI:CreateWindow(options)
 			BackgroundTransparency = 1,
 			Size = UDim2.new(1, 0, 1, 0),
 			BorderSizePixel = 0,
-			ScrollBarThickness = 4,
+			ScrollBarThickness = 2,
+			ScrollBarImageColor3 = ModernUI.Theme.Accent,
 			Visible = false
 		})
 		Create("UIListLayout", {
 			Parent = Page,
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			Padding = UDim.new(0, 8)
+			Padding = UDim.new(0, 12)
 		})
 		Create("UIPadding", {
 			Parent = Page,
@@ -394,22 +443,48 @@ function ModernUI:CreateWindow(options)
 		local function Activate()
 			for _, child in pairs(TabContainer:GetChildren()) do
 				if child:IsA("TextButton") then
-					TweenService:Create(child, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Theme.Background, TextColor3 = ModernUI.Theme.TextDark}):Play()
+					TweenService:Create(child, TweenInfo.new(0.2), {TextColor3 = ModernUI.Theme.TextDark}):Play()
 					local icon = child:FindFirstChild("ImageLabel")
 					if icon then TweenService:Create(icon, TweenInfo.new(0.2), {ImageColor3 = ModernUI.Theme.TextDark}):Play() end
+					
+					local activeInd = child:FindFirstChild("Frame") -- The background glow
+					if activeInd then activeInd.Visible = false end
+					
+					-- We need to find the bar indicator specifically, but since we added multiple frames, let's just hide all frames except ImageLabel? 
+					-- Or better, reference them.
+					-- Since we can't easily ref them in this loop without storing them, let's just rely on child order or names if we named them.
+					-- Let's name them.
 				end
 			end
+			
+			-- Reset all indicators (Simplified loop above wasn't perfect, let's do it properly)
+			for _, child in pairs(TabContainer:GetChildren()) do
+				if child:IsA("TextButton") then
+					local ind1 = child:FindFirstChild("ActiveIndicator")
+					local ind2 = child:FindFirstChild("BarIndicator")
+					if ind1 then ind1.Visible = false end
+					if ind2 then ind2.Visible = false end
+				end
+			end
+
 			for _, child in pairs(PageContainer:GetChildren()) do
 				if child:IsA("ScrollingFrame") then
 					child.Visible = false
 				end
 			end
 			
-			TweenService:Create(TabButton, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Theme.Accent, TextColor3 = ModernUI.Theme.Text}):Play()
+			TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = ModernUI.Theme.Text}):Play()
 			local icon = TabButton:FindFirstChild("ImageLabel")
 			if icon then TweenService:Create(icon, TweenInfo.new(0.2), {ImageColor3 = ModernUI.Theme.Text}):Play() end
+			
+			ActiveIndicator.Visible = true
+			BarIndicator.Visible = true
 			Page.Visible = true
 		end
+		
+		-- Naming for easier access
+		ActiveIndicator.Name = "ActiveIndicator"
+		BarIndicator.Name = "BarIndicator"
 
 		TabButton.MouseButton1Click:Connect(Activate)
 
@@ -430,13 +505,14 @@ function ModernUI:CreateWindow(options)
 					BorderSizePixel = 0,
 					ClipsDescendants = true
 				})
-				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = SectionFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 				
 				local Header = Create("TextLabel", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 5),
-					Size = UDim2.new(1, -20, 0, 20),
+					Position = UDim2.new(0, 12, 0, 8),
+					Size = UDim2.new(1, -24, 0, 20),
 					Font = Enum.Font.GothamBold,
 					Text = text,
 					TextColor3 = ModernUI.Theme.Text,
@@ -447,7 +523,7 @@ function ModernUI:CreateWindow(options)
 				local ContentContainer = Create("Frame", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 0, 0, 30),
+					Position = UDim2.new(0, 0, 0, 35),
 					Size = UDim2.new(1, 0, 0, 0)
 				})
 				
@@ -458,14 +534,14 @@ function ModernUI:CreateWindow(options)
 				})
 				Create("UIPadding", {
 					Parent = ContentContainer,
-					PaddingLeft = UDim.new(0, 10),
-					PaddingRight = UDim.new(0, 10),
-					PaddingBottom = UDim.new(0, 10)
+					PaddingLeft = UDim.new(0, 12),
+					PaddingRight = UDim.new(0, 12),
+					PaddingBottom = UDim.new(0, 12)
 				})
 				
 				List:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-					ContentContainer.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 10)
-					SectionFrame.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 40)
+					ContentContainer.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 12)
+					SectionFrame.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 47)
 				end)
 				
 				return CreateElements(ContentContainer)
@@ -479,22 +555,30 @@ function ModernUI:CreateWindow(options)
 				local ButtonFrame = Create("TextButton", {
 					Name = "Button",
 					Parent = ParentContainer,
-					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 40),
+					BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+					Size = UDim2.new(1, 0, 0, 42),
 					AutoButtonColor = false,
-					Font = Enum.Font.Gotham,
+					Font = Enum.Font.GothamBold,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = ButtonFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = ButtonFrame, CornerRadius = UDim.new(0, 21) }) -- Pill shape
+				Create("UIStroke", { Parent = ButtonFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+
+				ButtonFrame.MouseEnter:Connect(function()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+				end)
+				ButtonFrame.MouseLeave:Connect(function()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
+				end)
 
 				ButtonFrame.MouseButton1Click:Connect(function()
-					TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = ModernUI.Theme.Accent, TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 					Callback()
 					wait(0.1)
-					TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = ModernUI.Theme.Element}):Play()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45), TextColor3 = ModernUI.Theme.Text}):Play()
 				end)
 			end
 
@@ -515,19 +599,20 @@ function ModernUI:CreateWindow(options)
 					Name = "Toggle",
 					Parent = ParentContainer,
 					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 38),
 					AutoButtonColor = false,
 					Text = "",
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = ToggleFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = ToggleFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = ToggleFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Label = Create("TextLabel", {
 					Parent = ToggleFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 0),
+					Position = UDim2.new(0, 12, 0, 0),
 					Size = UDim2.new(1, -60, 1, 0),
-					Font = Enum.Font.Gotham,
+					Font = Enum.Font.GothamMedium,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
@@ -536,9 +621,9 @@ function ModernUI:CreateWindow(options)
 
 				local Indicator = Create("Frame", {
 					Parent = ToggleFrame,
-					BackgroundColor3 = State and ModernUI.Theme.Accent or Color3.fromRGB(80, 80, 80),
-					Position = UDim2.new(1, -50, 0.5, -10),
-					Size = UDim2.new(0, 40, 0, 20),
+					BackgroundColor3 = State and ModernUI.Theme.Accent or Color3.fromRGB(60, 60, 60),
+					Position = UDim2.new(1, -44, 0.5, -10),
+					Size = UDim2.new(0, 36, 0, 20),
 					BorderSizePixel = 0
 				})
 				Create("UICorner", { Parent = Indicator, CornerRadius = UDim.new(1, 0) })
@@ -561,7 +646,7 @@ function ModernUI:CreateWindow(options)
 						TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Theme.Accent}):Play()
 						TweenService:Create(Circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -18, 0.5, -8)}):Play()
 					else
-						TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
+						TweenService:Create(Indicator, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
 						TweenService:Create(Circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -8)}):Play()
 					end
 				end
@@ -599,71 +684,56 @@ function ModernUI:CreateWindow(options)
 				local SliderFrame = Create("Frame", {
 					Name = "Slider",
 					Parent = ParentContainer,
-					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 50),
+					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+					Size = UDim2.new(1, 0, 0, 45),
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = SliderFrame, CornerRadius = UDim.new(0, 4) })
-
-				local Label = Create("TextLabel", {
-					Parent = SliderFrame,
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 5),
-					Size = UDim2.new(1, -20, 0, 20),
-					Font = Enum.Font.Gotham,
-					Text = Text,
-					TextColor3 = ModernUI.Theme.Text,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left
-				})
-
-				local ValueLabel = Create("TextLabel", {
-					Parent = SliderFrame,
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 5),
-					Size = UDim2.new(1, -20, 0, 20),
-					Font = Enum.Font.Gotham,
-					Text = tostring(Value),
-					TextColor3 = ModernUI.Theme.TextDark,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Right
-				})
-
-				local SliderBar = Create("Frame", {
-					Parent = SliderFrame,
-					BackgroundColor3 = Color3.fromRGB(60, 60, 60),
-					Position = UDim2.new(0, 10, 0, 35),
-					Size = UDim2.new(1, -20, 0, 6),
-					BorderSizePixel = 0
-				})
-				Create("UICorner", { Parent = SliderBar, CornerRadius = UDim.new(1, 0) })
+				Create("UICorner", { Parent = SliderFrame, CornerRadius = UDim.new(0, 8) })
+				Create("UIStroke", { Parent = SliderFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Fill = Create("Frame", {
-					Parent = SliderBar,
+					Parent = SliderFrame,
 					BackgroundColor3 = ModernUI.Theme.Accent,
 					Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0),
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = Fill, CornerRadius = UDim.new(1, 0) })
+				Create("UICorner", { Parent = Fill, CornerRadius = UDim.new(0, 8) })
+				
+				-- Clip the fill so it doesn't overflow corners weirdly if we didn't use a separate container, 
+				-- but here we just match corners.
+				
+				local Label = Create("TextLabel", {
+					Parent = SliderFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 15, 0, 0),
+					Size = UDim2.new(1, -30, 1, 0),
+					Font = Enum.Font.GothamBold,
+					Text = tostring(Value) .. " " .. Text,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 14,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					ZIndex = 2
+				})
 
 				local Trigger = Create("TextButton", {
-					Parent = SliderBar,
+					Parent = SliderFrame,
 					BackgroundTransparency = 1,
 					Size = UDim2.new(1, 0, 1, 0),
-					Text = ""
+					Text = "",
+					ZIndex = 3
 				})
 
 				local function SetValue(val)
 					Value = math.clamp(val, Min, Max)
 					if Flag then ModernUI.Flags[Flag] = Value end
-					ValueLabel.Text = tostring(Value)
+					Label.Text = tostring(Value) .. " " .. Text
 					local Fraction = (Value - Min) / (Max - Min)
 					TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(Fraction, 0, 1, 0)}):Play()
 					Callback(Value)
 				end
 
 				local function Update(input)
-					local SizeX = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
+					local SizeX = math.clamp((input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X, 0, 1)
 					local NewValue = math.floor(Min + ((Max - Min) * SizeX))
 					SetValue(NewValue)
 				end
@@ -707,14 +777,15 @@ function ModernUI:CreateWindow(options)
 					Size = UDim2.new(1, 0, 0, 50),
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = TextboxFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = TextboxFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = TextboxFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Label = Create("TextLabel", {
 					Parent = TextboxFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 5),
-					Size = UDim2.new(1, -20, 0, 20),
-					Font = Enum.Font.Gotham,
+					Position = UDim2.new(0, 12, 0, 5),
+					Size = UDim2.new(1, -24, 0, 20),
+					Font = Enum.Font.GothamMedium,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
@@ -723,19 +794,32 @@ function ModernUI:CreateWindow(options)
 
 				local Input = Create("TextBox", {
 					Parent = TextboxFrame,
-					BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-					Position = UDim2.new(0, 10, 0, 25),
-					Size = UDim2.new(1, -20, 0, 20),
+					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+					Position = UDim2.new(0, 12, 0, 28),
+					Size = UDim2.new(1, -24, 0, 18),
 					Font = Enum.Font.Gotham,
 					PlaceholderText = Placeholder,
 					Text = "",
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 13,
-					BorderSizePixel = 0
+					BorderSizePixel = 0,
+					ClearTextOnFocus = false
 				})
 				Create("UICorner", { Parent = Input, CornerRadius = UDim.new(0, 4) })
+				
+				local InputStroke = Create("UIStroke", {
+					Parent = Input,
+					Color = Color3.fromRGB(60, 60, 60),
+					Thickness = 1,
+					ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+				})
+
+				Input.Focused:Connect(function()
+					TweenService:Create(InputStroke, TweenInfo.new(0.2), {Color = ModernUI.Theme.Accent}):Play()
+				end)
 
 				Input.FocusLost:Connect(function(enterPressed)
+					TweenService:Create(InputStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(60, 60, 60)}):Play()
 					if Flag then ModernUI.Flags[Flag] = Input.Text end
 					Callback(Input.Text)
 				end)
@@ -754,25 +838,26 @@ function ModernUI:CreateWindow(options)
 					Name = "Dropdown",
 					Parent = ParentContainer,
 					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 38),
 					BorderSizePixel = 0,
 					ClipsDescendants = true
 				})
-				Create("UICorner", { Parent = DropdownFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = DropdownFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = DropdownFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Trigger = Create("TextButton", {
 					Parent = DropdownFrame,
 					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 38),
 					Text = ""
 				})
 
 				local Label = Create("TextLabel", {
 					Parent = DropdownFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 0),
-					Size = UDim2.new(1, -40, 0, 40),
-					Font = Enum.Font.Gotham,
+					Position = UDim2.new(0, 12, 0, 0),
+					Size = UDim2.new(1, -40, 0, 38),
+					Font = Enum.Font.GothamMedium,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
@@ -782,7 +867,7 @@ function ModernUI:CreateWindow(options)
 				local Arrow = Create("ImageLabel", {
 					Parent = DropdownFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(1, -30, 0, 10),
+					Position = UDim2.new(1, -30, 0, 9),
 					Size = UDim2.new(0, 20, 0, 20),
 					Image = "rbxassetid://6031091004",
 					ImageColor3 = ModernUI.Theme.TextDark
@@ -791,7 +876,7 @@ function ModernUI:CreateWindow(options)
 				local ItemContainer = Create("Frame", {
 					Parent = DropdownFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 0, 0, 40),
+					Position = UDim2.new(0, 0, 0, 38),
 					Size = UDim2.new(1, 0, 0, 0),
 					ClipsDescendants = true
 				})
@@ -799,13 +884,13 @@ function ModernUI:CreateWindow(options)
 				local UIList = Create("UIListLayout", {
 					Parent = ItemContainer,
 					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 2)
+					Padding = UDim.new(0, 4)
 				})
 				Create("UIPadding", {
 					Parent = ItemContainer,
-					PaddingLeft = UDim.new(0, 10),
-					PaddingRight = UDim.new(0, 10),
-					PaddingBottom = UDim.new(0, 5)
+					PaddingLeft = UDim.new(0, 8),
+					PaddingRight = UDim.new(0, 8),
+					PaddingBottom = UDim.new(0, 8)
 				})
 
 				local function RefreshItems()
@@ -816,8 +901,8 @@ function ModernUI:CreateWindow(options)
 					for _, item in pairs(Items) do
 						local ItemButton = Create("TextButton", {
 							Parent = ItemContainer,
-							BackgroundColor3 = Color3.fromRGB(60, 60, 60),
-							Size = UDim2.new(1, 0, 0, 30),
+							BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+							Size = UDim2.new(1, 0, 0, 28),
 							AutoButtonColor = false,
 							Font = Enum.Font.Gotham,
 							Text = item,
@@ -832,8 +917,15 @@ function ModernUI:CreateWindow(options)
 							if Flag then ModernUI.Flags[Flag] = item end
 							Callback(item)
 							DropdownOpen = false
-							TweenService:Create(DropdownFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+							TweenService:Create(DropdownFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, 38)}):Play()
 							TweenService:Create(Arrow, TweenInfo.new(0.3), {Rotation = 0}):Play()
+						end)
+						
+						ItemButton.MouseEnter:Connect(function()
+							TweenService:Create(ItemButton, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Theme.Accent, TextColor3 = ModernUI.Theme.Text}):Play()
+						end)
+						ItemButton.MouseLeave:Connect(function()
+							TweenService:Create(ItemButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40), TextColor3 = ModernUI.Theme.TextDark}):Play()
 						end)
 					end
 				end
@@ -842,12 +934,12 @@ function ModernUI:CreateWindow(options)
 
 				Trigger.MouseButton1Click:Connect(function()
 					DropdownOpen = not DropdownOpen
-					local ContentSize = UIList.AbsoluteContentSize.Y + 50
+					local ContentSize = UIList.AbsoluteContentSize.Y + 46
 					if DropdownOpen then
 						TweenService:Create(DropdownFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, ContentSize)}):Play()
 						TweenService:Create(Arrow, TweenInfo.new(0.3), {Rotation = 180}):Play()
 					else
-						TweenService:Create(DropdownFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+						TweenService:Create(DropdownFrame, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, 38)}):Play()
 						TweenService:Create(Arrow, TweenInfo.new(0.3), {Rotation = 0}):Play()
 					end
 				end)
@@ -946,7 +1038,6 @@ function ModernUI:CreateWindow(options)
 				local Callback = options.Callback or function() end
 
 				if Flag then
-					-- Load keycode from string if needed, but for now simple
 					-- ModernUI.Flags[Flag] = ...
 				end
 
@@ -956,17 +1047,18 @@ function ModernUI:CreateWindow(options)
 					Name = "Keybind",
 					Parent = ParentContainer,
 					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 38),
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = KeybindFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = KeybindFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = KeybindFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Label = Create("TextLabel", {
 					Parent = KeybindFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 0),
+					Position = UDim2.new(0, 12, 0, 0),
 					Size = UDim2.new(1, -100, 1, 0),
-					Font = Enum.Font.Gotham,
+					Font = Enum.Font.GothamMedium,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
@@ -975,7 +1067,7 @@ function ModernUI:CreateWindow(options)
 
 				local BindButton = Create("TextButton", {
 					Parent = KeybindFrame,
-					BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+					BackgroundColor3 = Color3.fromRGB(40, 40, 40),
 					Position = UDim2.new(1, -90, 0.5, -12),
 					Size = UDim2.new(0, 80, 0, 24),
 					Font = Enum.Font.Gotham,
@@ -985,12 +1077,14 @@ function ModernUI:CreateWindow(options)
 					AutoButtonColor = false
 				})
 				Create("UICorner", { Parent = BindButton, CornerRadius = UDim.new(0, 4) })
+				Create("UIStroke", { Parent = BindButton, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Listening = false
 
 				BindButton.MouseButton1Click:Connect(function()
 					Listening = true
 					BindButton.Text = "..."
+					TweenService:Create(BindButton, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Theme.Accent}):Play()
 				end)
 
 				UserInputService.InputBegan:Connect(function(input)
@@ -998,6 +1092,7 @@ function ModernUI:CreateWindow(options)
 						Key = input.KeyCode
 						BindButton.Text = Key.Name
 						Listening = false
+						TweenService:Create(BindButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play()
 						if Flag then ModernUI.Flags[Flag] = Key.Name end
 						Callback(Key)
 					elseif not Listening and input.KeyCode == Key then
@@ -1019,17 +1114,18 @@ function ModernUI:CreateWindow(options)
 					Name = "ColorPicker",
 					Parent = ParentContainer,
 					BackgroundColor3 = ModernUI.Theme.Element,
-					Size = UDim2.new(1, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 38),
 					BorderSizePixel = 0
 				})
-				Create("UICorner", { Parent = PickerFrame, CornerRadius = UDim.new(0, 4) })
+				Create("UICorner", { Parent = PickerFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = PickerFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				local Label = Create("TextLabel", {
 					Parent = PickerFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 10, 0, 0),
+					Position = UDim2.new(0, 12, 0, 0),
 					Size = UDim2.new(1, -60, 1, 0),
-					Font = Enum.Font.Gotham,
+					Font = Enum.Font.GothamMedium,
 					Text = Text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
@@ -1045,6 +1141,7 @@ function ModernUI:CreateWindow(options)
 					AutoButtonColor = false
 				})
 				Create("UICorner", { Parent = ColorPreview, CornerRadius = UDim.new(0, 4) })
+				Create("UIStroke", { Parent = ColorPreview, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 
 				-- Simple Color Picker Popup (RGB Sliders)
 				local PickerPopup = Create("Frame", {
@@ -1055,6 +1152,7 @@ function ModernUI:CreateWindow(options)
 					ZIndex = 20
 				})
 				Create("UICorner", { Parent = PickerPopup, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = PickerPopup, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 				
 				local function UpdateColor(newColor)
 					Color = newColor
@@ -1068,24 +1166,23 @@ function ModernUI:CreateWindow(options)
 					PickerPopup.Position = UDim2.new(0, ColorPreview.AbsolutePosition.X - 160, 0, ColorPreview.AbsolutePosition.Y + 30)
 				end)
 				
-				-- Add Sliders to Popup (Simplified)
-				local R = 0
-				local G = 0
-				local B = 0
-				
 				-- Helper for picker sliders
 				local function CreatePickerSlider(y, color, onChange)
 					local SFrame = Create("Frame", {
 						Parent = PickerPopup,
-						BackgroundColor3 = Color3.fromRGB(60,60,60),
+						BackgroundColor3 = Color3.fromRGB(40, 40, 40),
 						Position = UDim2.new(0, 10, 0, y),
 						Size = UDim2.new(1, -20, 0, 20)
 					})
+					Create("UICorner", { Parent = SFrame, CornerRadius = UDim.new(0, 4) })
+					
 					local Bar = Create("Frame", {
 						Parent = SFrame,
 						BackgroundColor3 = color,
 						Size = UDim2.new(0,0,1,0)
 					})
+					Create("UICorner", { Parent = Bar, CornerRadius = UDim.new(0, 4) })
+					
 					local Btn = Create("TextButton", {
 						Parent = SFrame,
 						BackgroundTransparency = 1,
@@ -1093,7 +1190,6 @@ function ModernUI:CreateWindow(options)
 						Text = ""
 					})
 					Btn.MouseButton1Click:Connect(function() 
-						-- Simple click logic, ideally drag
 						local Mouse = game.Players.LocalPlayer:GetMouse()
 						local RelX = math.clamp((Mouse.X - SFrame.AbsolutePosition.X) / SFrame.AbsoluteSize.X, 0, 1)
 						Bar.Size = UDim2.new(RelX, 0, 1, 0)
@@ -1102,7 +1198,6 @@ function ModernUI:CreateWindow(options)
 				end
 				
 				CreatePickerSlider(10, Color3.fromRGB(255,0,0), function(v) 
-					local _, g, b = Color.G, Color.B
 					UpdateColor(Color3.new(v, Color.G, Color.B))
 				end)
 				CreatePickerSlider(40, Color3.fromRGB(0,255,0), function(v) 
