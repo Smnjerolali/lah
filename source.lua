@@ -133,20 +133,16 @@ function ModernUI:CreateWindow(options)
 	Create("UICorner", { Parent = MainFrame, CornerRadius = ModernUI.Theme.CornerRadius })
 	Create("UIStroke", { Parent = MainFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 	
-	-- Add dramatic gradient to main window
+	-- Dramatic gradient similar to reference (dark color to pure black)
 	local MainGradient = Create("UIGradient", {
 		Parent = MainFrame,
 		Color = ColorSequence.new{
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 35)), -- Dark top
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 5, 5)) -- Near black bottom
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(15, 35, 30)), -- Dark teal/green top
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(5, 10, 8)), -- Mid darker
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)) -- Pure black bottom
 		},
 		Rotation = 180 -- Top to bottom
 	})
-	
-	-- Add blur effect to camera when UI is open
-	local Blur = Instance.new("BlurEffect")
-	Blur.Size = 10
-	Blur.Parent = game:GetService("Lighting")
 
 	-- Sidebar (Left)
 	local Sidebar = Create("Frame", {
@@ -229,7 +225,6 @@ function ModernUI:CreateWindow(options)
 		TextSize = 18
 	})
 	CloseBtn.MouseButton1Click:Connect(function()
-		if Blur then Blur:Destroy() end -- Remove blur when closing
 		ScreenGui:Destroy()
 	end)
 	CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 50, 50)}):Play() end)
@@ -730,31 +725,6 @@ function ModernUI:CreateWindow(options)
 					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
 					Size = UDim2.new(1, 0, 0, 45),
 					BorderSizePixel = 0
-				})
-				Create("UICorner", { Parent = SliderFrame, CornerRadius = UDim.new(0, 8) })
-				Create("UIStroke", { Parent = SliderFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
-
-				local Fill = Create("Frame", {
-					Parent = SliderFrame,
-					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-					Size = UDim2.new((Value - Min) / (Max - Min), 0, 1, 0),
-					BorderSizePixel = 0
-				})
-				Create("UICorner", { Parent = Fill, CornerRadius = UDim.new(0, 8) })
-				
-				local Gradient = Create("UIGradient", {
-					Parent = Fill,
-					Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, ModernUI.Theme.GradientStart),
-						ColorSequenceKeypoint.new(1, ModernUI.Theme.GradientEnd)
-					},
-					Rotation = 90
-				})
-				
-				-- Clip the fill so it doesn't overflow corners weirdly if we didn't use a separate container, 
-				-- but here we just match corners.
-				
-				local Label = Create("TextLabel", {
 					Parent = SliderFrame,
 					BackgroundTransparency = 1,
 					Position = UDim2.new(0, 15, 0, 0),
