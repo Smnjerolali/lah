@@ -501,6 +501,119 @@ function ModernUI:CreateWindow(options)
 		local function CreateElements(ParentContainer)
 			local Container = {}
 
+			function Container:CreateInfoCard(options)
+				options = options or {}
+				local Title = options.Title or "Info Card"
+				local GradientColor = options.GradientColor or Color3.fromRGB(46, 204, 113)
+				
+				local CardFrame = Create("Frame", {
+					Name = "InfoCard",
+					Parent = ParentContainer,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+					Size = UDim2.new(1, 0, 0, 0),
+					BorderSizePixel = 0,
+					ClipsDescendants = true
+				})
+				Create("UICorner", { Parent = CardFrame, CornerRadius = UDim.new(0, 12) })
+				Create("UIStroke", { Parent = CardFrame, Color = GradientColor, Thickness = 1 })
+				
+				-- Dramatic gradient for card
+				local CardGradient = Create("UIGradient", {
+					Parent = CardFrame,
+					Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, GradientColor),
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+					},
+					Rotation = 135
+				})
+				
+				local CardTitle = Create("TextLabel", {
+					Parent = CardFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 15, 0, 12),
+					Size = UDim2.new(1, -30, 0, 22),
+					Font = Enum.Font.GothamBold,
+					Text = Title,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 16,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					ZIndex = 2
+				})
+				
+				local CardContent = Create("Frame", {
+					Parent = CardFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 0),
+					ZIndex = 2
+				})
+				
+				local ContentList = Create("UIListLayout", {
+					Parent = CardContent,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 8)
+				})
+				Create("UIPadding", {
+					Parent = CardContent,
+					PaddingLeft = UDim.new(0, 15),
+					PaddingRight = UDim.new(0, 15),
+					PaddingBottom = UDim.new(0, 15)
+				})
+				
+				ContentList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+					CardContent.Size = UDim2.new(1, 0, 0, ContentList.AbsoluteContentSize.Y + 15)
+					CardFrame.Size = UDim2.new(1, 0, 0, ContentList.AbsoluteContentSize.Y + 55)
+				end)
+				
+				local CardContainer = {}
+				
+				function CardContainer:AddLabel(text)
+					local Label = Create("TextLabel", {
+						Parent = CardContent,
+						BackgroundTransparency = 1,
+						Size = UDim2.new(1, 0, 0, 18),
+						Font = Enum.Font.Gotham,
+						Text = text,
+						TextColor3 = ModernUI.Theme.Text,
+						TextSize = 13,
+						TextXAlignment = Enum.TextXAlignment.Left,
+						TextTransparency = 0.3
+					})
+					return Label
+				end
+				
+				function CardContainer:AddButton(btnOptions)
+					btnOptions = btnOptions or {}
+					local BtnText = btnOptions.Text or "Button"
+					local BtnCallback = btnOptions.Callback or function() end
+					
+					local Btn = Create("TextButton", {
+						Parent = CardContent,
+						BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+						Size = UDim2.new(1, 0, 0, 32),
+						AutoButtonColor = false,
+						Font = Enum.Font.GothamBold,
+						Text = BtnText,
+						TextColor3 = ModernUI.Theme.Text,
+						TextSize = 13,
+						BorderSizePixel = 0
+					})
+					Create("UICorner", { Parent = Btn, CornerRadius = UDim.new(0, 6) })
+					Create("UIStroke", { Parent = Btn, Color = Color3.fromRGB(40, 40, 40), Thickness = 1 })
+					
+					Btn.MouseButton1Click:Connect(function()
+						TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = GradientColor}):Play()
+						BtnCallback()
+						wait(0.1)
+						TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 25)}):Play()
+					end)
+					
+					return Btn
+				end
+				
+				return CardContainer
+			end
+
 			function Container:CreateSection(text)
 				local SectionFrame = Create("Frame", {
 					Name = "Section",
