@@ -484,6 +484,120 @@ function ModernUI:CreateWindow(options)
 			for _, child in pairs(PageContainer:GetChildren()) do
 				if child:IsA("ScrollingFrame") then
 					child.Visible = false
+				end
+			end
+			
+			TweenService:Create(TabButton, TweenInfo.new(0.2), {TextColor3 = ModernUI.Theme.Text}):Play()
+			local icon = TabButton:FindFirstChild("ImageLabel")
+			if icon then TweenService:Create(icon, TweenInfo.new(0.2), {ImageColor3 = ModernUI.Theme.Text}):Play() end
+			
+			ActiveIndicator.Visible = true
+			BarIndicator.Visible = true
+			Page.Visible = true
+		end
+		
+		-- Naming for easier access
+		ActiveIndicator.Name = "ActiveIndicator"
+		BarIndicator.Name = "BarIndicator"
+
+		TabButton.MouseButton1Click:Connect(Activate)
+
+		if FirstTab then
+			FirstTab = false
+			Activate()
+		end
+
+		local function CreateElements(ParentContainer)
+			local Container = {}
+
+			function Container:CreateSection(text)
+				local SectionFrame = Create("Frame", {
+					Name = "Section",
+					Parent = ParentContainer,
+					BackgroundColor3 = ModernUI.Theme.Section,
+					Size = UDim2.new(1, 0, 0, 0),
+					BorderSizePixel = 0,
+					ClipsDescendants = true
+				})
+				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UIStroke", { Parent = SectionFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+				
+				local Header = Create("TextLabel", {
+					Parent = SectionFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 12, 0, 8),
+					Size = UDim2.new(1, -24, 0, 20),
+					Font = Enum.Font.GothamBold,
+					Text = text,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 13,
+					TextXAlignment = Enum.TextXAlignment.Left
+				})
+				
+				local ContentContainer = Create("Frame", {
+					Parent = SectionFrame,
+					BackgroundTransparency = 1,
+					Position = UDim2.new(0, 0, 0, 35),
+					Size = UDim2.new(1, 0, 0, 0)
+				})
+				
+				local List = Create("UIListLayout", {
+					Parent = ContentContainer,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 8)
+				})
+				Create("UIPadding", {
+					Parent = ContentContainer,
+					PaddingLeft = UDim.new(0, 12),
+					PaddingRight = UDim.new(0, 12),
+					PaddingBottom = UDim.new(0, 12)
+				})
+				
+				List:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+					ContentContainer.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 12)
+					SectionFrame.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 47)
+				end)
+				
+				return CreateElements(ContentContainer)
+			end
+
+			function Container:CreateButton(options)
+				options = options or {}
+				local Text = options.Text or "Button"
+				local Callback = options.Callback or function() end
+
+				local ButtonFrame = Create("TextButton", {
+					Name = "Button",
+					Parent = ParentContainer,
+					BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+					Size = UDim2.new(1, 0, 0, 42),
+					AutoButtonColor = false,
+					Font = Enum.Font.GothamBold,
+					Text = Text,
+					TextColor3 = ModernUI.Theme.Text,
+					TextSize = 14,
+					BorderSizePixel = 0
+				})
+				Create("UICorner", { Parent = ButtonFrame, CornerRadius = UDim.new(0, 21) }) -- Pill shape
+				Create("UIStroke", { Parent = ButtonFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+
+				-- Subtle Gradient for Button
+				local Gradient = Create("UIGradient", {
+					Parent = ButtonFrame,
+					Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, Color3.fromRGB(45, 45, 45)),
+						ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))
+					},
+					Rotation = 90
+				})
+
+				ButtonFrame.MouseEnter:Connect(function()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(55, 55, 55)}):Play()
+				end)
+				ButtonFrame.MouseLeave:Connect(function()
+					TweenService:Create(ButtonFrame, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
+				end)
+
 				ButtonFrame.MouseButton1Click:Connect(function()
 					TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = ModernUI.Theme.Accent, TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 					Callback()
