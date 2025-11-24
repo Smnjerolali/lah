@@ -714,41 +714,6 @@ function ModernUI:CreateWindow(options)
 				local Callback = options.Callback or function() end
 
 				if Flag then
-					Default = ModernUI.Flags[Flag] or Default
-				end
-
-				local Value = Default
-
-				local SliderFrame = Create("Frame", {
-					Name = "Slider",
-					Parent = ParentContainer,
-					BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-					Size = UDim2.new(1, 0, 0, 45),
-					BorderSizePixel = 0
-					Parent = SliderFrame,
-					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 15, 0, 0),
-					Size = UDim2.new(1, -30, 1, 0),
-					Font = Enum.Font.GothamBold,
-					Text = tostring(Value) .. " " .. Text,
-					TextColor3 = ModernUI.Theme.Text,
-					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					ZIndex = 2
-				})
-
-				local Trigger = Create("TextButton", {
-					Parent = SliderFrame,
-					BackgroundTransparency = 1,
-					Size = UDim2.new(1, 0, 1, 0),
-					Text = "",
-					ZIndex = 3
-				})
-
-				local function SetValue(val)
-					Value = math.clamp(val, Min, Max)
-					if Flag then ModernUI.Flags[Flag] = Value end
-					Label.Text = tostring(Value) .. " " .. Text
 					local Fraction = (Value - Min) / (Max - Min)
 					TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(Fraction, 0, 1, 0)}):Play()
 					Callback(Value)
