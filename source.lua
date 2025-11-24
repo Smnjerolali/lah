@@ -514,31 +514,42 @@ function ModernUI:CreateWindow(options)
 				local SectionFrame = Create("Frame", {
 					Name = "Section",
 					Parent = ParentContainer,
-					BackgroundColor3 = ModernUI.Theme.Section,
+					BackgroundColor3 = Color3.fromRGB(255, 255, 255), -- White for gradient
 					Size = UDim2.new(1, 0, 0, 0),
 					BorderSizePixel = 0,
 					ClipsDescendants = true
 				})
-				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 6) })
+				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 12) })
 				Create("UIStroke", { Parent = SectionFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+				
+				local Gradient = Create("UIGradient", {
+					Parent = SectionFrame,
+					Color = ColorSequence.new{
+						ColorSequenceKeypoint.new(0, ModernUI.Theme.GradientStart),
+						ColorSequenceKeypoint.new(1, ModernUI.Theme.GradientEnd)
+					},
+					Rotation = 45
+				})
 				
 				local Header = Create("TextLabel", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 12, 0, 8),
-					Size = UDim2.new(1, -24, 0, 20),
+					Position = UDim2.new(0, 15, 0, 10),
+					Size = UDim2.new(1, -30, 0, 20),
 					Font = Enum.Font.GothamBold,
 					Text = text,
 					TextColor3 = ModernUI.Theme.Text,
-					TextSize = 13,
-					TextXAlignment = Enum.TextXAlignment.Left
+					TextSize = 14,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					ZIndex = 2
 				})
 				
 				local ContentContainer = Create("Frame", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 0, 0, 35),
-					Size = UDim2.new(1, 0, 0, 0)
+					Position = UDim2.new(0, 0, 0, 40),
+					Size = UDim2.new(1, 0, 0, 0),
+					ZIndex = 2
 				})
 				
 				local List = Create("UIListLayout", {
@@ -548,14 +559,14 @@ function ModernUI:CreateWindow(options)
 				})
 				Create("UIPadding", {
 					Parent = ContentContainer,
-					PaddingLeft = UDim.new(0, 12),
-					PaddingRight = UDim.new(0, 12),
-					PaddingBottom = UDim.new(0, 12)
+					PaddingLeft = UDim.new(0, 15),
+					PaddingRight = UDim.new(0, 15),
+					PaddingBottom = UDim.new(0, 15)
 				})
 				
 				List:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-					ContentContainer.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 12)
-					SectionFrame.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 47)
+					ContentContainer.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 15)
+					SectionFrame.Size = UDim2.new(1, 0, 0, List.AbsoluteContentSize.Y + 55)
 				end)
 				
 				return CreateElements(ContentContainer)
