@@ -123,7 +123,7 @@ function ModernUI:CreateWindow(options)
 		Name = "MainFrame",
 		Parent = ScreenGui,
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-		BackgroundTransparency = 0.1,
+		BackgroundTransparency = 0,
 		Position = UDim2.new(0.5, -350, 0.5, -250),
 		Size = UDim2.new(0, 700, 0, 500),
 		BorderSizePixel = 0
@@ -140,6 +140,18 @@ function ModernUI:CreateWindow(options)
 			ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
 		},
 		Rotation = 180
+	})
+	
+	-- Add frosted glass blur effect
+	local BlurFrame = Create("ImageLabel", {
+		Parent = MainFrame,
+		BackgroundTransparency = 1,
+		Size = UDim2.new(1, 0, 1, 0),
+		Image = "rbxasset://textures/ui/GuiImagePlaceholder.png",
+		ImageTransparency = 0.98,
+		ScaleType = Enum.ScaleType.Tile,
+		TileSize = UDim2.new(0, 100, 0, 100),
+		ZIndex = 0
 	})
 
 	-- Sidebar
