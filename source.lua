@@ -124,13 +124,29 @@ function ModernUI:CreateWindow(options)
 	local MainFrame = Create("Frame", {
 		Name = "MainFrame",
 		Parent = ScreenGui,
-		BackgroundColor3 = ModernUI.Theme.Background,
+		BackgroundColor3 = Color3.fromRGB(255, 255, 255), -- White base for gradient
+		BackgroundTransparency = 0.1, -- Slight transparency for glass effect
 		Position = UDim2.new(0.5, -350, 0.5, -250),
 		Size = UDim2.new(0, 700, 0, 500),
 		BorderSizePixel = 0
 	})
 	Create("UICorner", { Parent = MainFrame, CornerRadius = ModernUI.Theme.CornerRadius })
 	Create("UIStroke", { Parent = MainFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
+	
+	-- Add dramatic gradient to main window
+	local MainGradient = Create("UIGradient", {
+		Parent = MainFrame,
+		Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 35)), -- Dark top
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 5, 5)) -- Near black bottom
+		},
+		Rotation = 180 -- Top to bottom
+	})
+	
+	-- Add blur effect to camera when UI is open
+	local Blur = Instance.new("BlurEffect")
+	Blur.Size = 10
+	Blur.Parent = game:GetService("Lighting")
 
 	-- Sidebar (Left)
 	local Sidebar = Create("Frame", {
@@ -213,6 +229,7 @@ function ModernUI:CreateWindow(options)
 		TextSize = 18
 	})
 	CloseBtn.MouseButton1Click:Connect(function()
+		if Blur then Blur:Destroy() end -- Remove blur when closing
 		ScreenGui:Destroy()
 	end)
 	CloseBtn.MouseEnter:Connect(function() TweenService:Create(CloseBtn, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 50, 50)}):Play() end)
@@ -516,7 +533,7 @@ function ModernUI:CreateWindow(options)
 				local SectionFrame = Create("Frame", {
 					Name = "Section",
 					Parent = ParentContainer,
-					BackgroundColor3 = Color3.fromRGB(255, 255, 255), -- White for gradient
+					BackgroundColor3 = Color3.fromRGB(20, 20, 20), -- Solid dark background
 					Size = UDim2.new(1, 0, 0, 0),
 					BorderSizePixel = 0,
 					ClipsDescendants = true
@@ -524,40 +541,29 @@ function ModernUI:CreateWindow(options)
 				Create("UICorner", { Parent = SectionFrame, CornerRadius = UDim.new(0, 12) })
 				Create("UIStroke", { Parent = SectionFrame, Color = ModernUI.Theme.Stroke, Thickness = 1 })
 				
-				local Gradient = Create("UIGradient", {
-					Parent = SectionFrame,
-					Color = ColorSequence.new{
-						ColorSequenceKeypoint.new(0, ModernUI.Theme.GradientStart),
-						ColorSequenceKeypoint.new(1, ModernUI.Theme.GradientEnd)
-					},
-					Rotation = 45
-				})
-				
 				local Header = Create("TextLabel", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
-					Position = UDim2.new(0, 15, 0, 10),
-					Size = UDim2.new(1, -30, 0, 20),
+					Position = UDim2.new(0, 15, 0, 12),
+					Size = UDim2.new(1, -30, 0, 22),
 					Font = Enum.Font.GothamBold,
 					Text = text,
 					TextColor3 = ModernUI.Theme.Text,
 					TextSize = 14,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					ZIndex = 2
+					TextXAlignment = Enum.TextXAlignment.Left
 				})
 				
 				local ContentContainer = Create("Frame", {
 					Parent = SectionFrame,
 					BackgroundTransparency = 1,
 					Position = UDim2.new(0, 0, 0, 40),
-					Size = UDim2.new(1, 0, 0, 0),
-					ZIndex = 2
+					Size = UDim2.new(1, 0, 0, 0)
 				})
 				
 				local List = Create("UIListLayout", {
 					Parent = ContentContainer,
 					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 8)
+					Padding = UDim.new(0, 10)
 				})
 				Create("UIPadding", {
 					Parent = ContentContainer,
